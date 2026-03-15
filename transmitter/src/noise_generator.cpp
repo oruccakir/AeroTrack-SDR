@@ -27,7 +27,13 @@ NoiseGenerator::IQVector NoiseGenerator::addNoise(const IQVector &signal,
   // SNR'den gürültü gücünü hesapla
   // SNR_dB = 10 * log10(P_signal / P_noise)
   // P_noise = P_signal / 10^(SNR_dB/10)
-  double noise_power = signal_power / std::pow(10.0, snr_db / 10.0);
+  // Sinyal gücü 0 ise minimum gürültü tabanı kullan (termal gürültü)
+  double noise_power;
+  if (signal_power < 1e-20) {
+    noise_power = 1.0 / std::pow(10.0, snr_db / 10.0);
+  } else {
+    noise_power = signal_power / std::pow(10.0, snr_db / 10.0);
+  }
 
   // Gürültü standart sapması (her bir I/Q bileşeni için)
   // Toplam gürültü gücü = σ_I² + σ_Q² = 2*σ²
